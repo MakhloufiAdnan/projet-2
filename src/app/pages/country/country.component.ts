@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic } from '../../models/olympic.model';
 import { Participation } from '../../models/participation.model';
+import { OlympicService } from 'src/app/services/olympic.service';
+import { StatisticsService } from 'src/app/services/statistics.service';
 
 @Component({
   selector: 'app-country',
@@ -14,7 +16,6 @@ import { Participation } from '../../models/participation.model';
   styleUrls: ['./country.component.scss'],
 })
 export class CountryComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
   public lineChart!: Chart<'line', number[], number | string>;
   public titlePage = '';
   public totalEntries = 0;
@@ -23,9 +24,10 @@ export class CountryComponent implements OnInit {
   public error = '';
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private http: HttpClient
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly olympicService: OlympicService,
+    private readonly statisticsService: StatisticsService,
   ) {}
 
   ngOnInit() {
@@ -35,15 +37,15 @@ export class CountryComponent implements OnInit {
       countryName = param.get('countryName');
     });
 
-    this.http.get<Olympic[]>(this.olympicUrl).subscribe(
-      (data) => {
+    this.olympicService.getOlympics().subscribe({
+      next: (data: Olympic[]) => {
         if (!countryName) {
           this.error = 'No country provided';
           return;
         }
 
         const selectedCountry = data.find(
-          (o: Olympic) => o.country === countryName
+          (o: Olympic) => o.country === countryName,
         );
 
         if (!selectedCountry) {
@@ -54,27 +56,20 @@ export class CountryComponent implements OnInit {
         const participations = selectedCountry.participations;
         const years = participations.map((p: Participation) => p.year);
         const medals = participations.map((p: Participation) => p.medalsCount);
-        const nbAthletes = participations.map(
-          (p: Participation) => p.athleteCount
-        );
 
         this.titlePage = selectedCountry.country;
         this.totalEntries = participations.length;
-        this.totalMedals = medals.reduce(
-          (accumulator: number, m: number) => accumulator + m,
-          0
-        );
-        this.totalAthletes = nbAthletes.reduce(
-          (accumulator: number, a: number) => accumulator + a,
-          0
-        );
+        this.totalMedals =
+          this.statisticsService.getTotalMedals(participations);
+        this.totalAthletes =
+          this.statisticsService.getTotalAthletes(participations);
 
         this.buildChart(years, medals);
       },
-      (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         this.error = error.message;
-      }
-    );
+      },
+    });
   }
 
   buildChart(years: number[], medals: number[]) {

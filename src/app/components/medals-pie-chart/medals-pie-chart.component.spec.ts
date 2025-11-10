@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HomeComponent } from './home.component';
+import { MedalsPieChartComponent } from './medals-pie-chart.component';
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+describe('MedalsPieChartComponent', () => {
+  let component: MedalsPieChartComponent;
+  let fixture: ComponentFixture<MedalsPieChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [HomeComponent],
+      imports: [MedalsPieChartComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HomeComponent);
+    fixture = TestBed.createComponent(MedalsPieChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

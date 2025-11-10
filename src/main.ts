@@ -12,9 +12,7 @@ if (environment.production) {
 }
 
 bootstrapApplication(AppComponent, {
-  providers: [provideRouter(routes), 
-    provideHttpClient()
-  ],
+  providers: [provideRouter(routes), provideHttpClient()],
 })
   // NOSONAR
-  .catch(err => console.error(err));
+  .catch((err) => console.error(err));

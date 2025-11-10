@@ -1,19 +1,18 @@
-
 .wrapper-container {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .container {
-    width: 50%;
-    h2{
-        text-align: center;
-        color: gray;
-    }
+  width: 50%;
+  h2 {
+    text-align: center;
+    color: gray;
+  }
 }
 
 @media screen and (max-width: 1000px) {
-    .container {
-        width: 100%;
-    }
+  .container {
+    width: 100%;
+  }
 }

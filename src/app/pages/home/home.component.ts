@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Olympic } from '../../models/olympic.model';
+import { OlympicService } from 'src/app/services/olympic.service';
+import { StatisticsService } from 'src/app/services/statistics.service';
 
 @Component({
   selector: 'app-home',
@@ -13,40 +15,39 @@ import { Olympic } from '../../models/olympic.model';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
   public pieChart!: Chart<'pie', number[], string>;
   public totalCountries = 0;
   public totalJOs = 0;
   public error = '';
   titlePage = 'Medals per Country';
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private readonly router: Router,
+    private readonly olympicService: OlympicService,
+    private readonly statisticsService: StatisticsService,
+  ) {}
 
   ngOnInit() {
-    this.http.get<Olympic[]>(this.olympicUrl).subscribe(
-      (data) => {
+    this.olympicService.getOlympics().subscribe({
+      next: (data: Olympic[]) => {
         if (data && data.length > 0) {
-          const allParticipations = data.flatMap(
-            (o: Olympic) => o.participations
-          );
-
-          this.totalJOs = new Set(allParticipations.map((p) => p.year)).size;
+          this.totalJOs = this.statisticsService.getTotalJOs(data);
 
           const countries = data.map((o) => o.country);
-          this.totalCountries = countries.length;
+          this.totalCountries = this.statisticsService.getTotalCountries(data);
 
           const sumOfAllMedalsYears = data.map((o) =>
-            o.participations.reduce((acc, p) => acc + p.medalsCount, 0)
+            this.statisticsService.getTotalMedals(o.participations),
           );
 
           this.buildPieChart(countries, sumOfAllMedalsYears);
         }
       },
-      (error: HttpErrorResponse) => {
-        console.log(`erreur : ${error}`);
+      error: (error: HttpErrorResponse) => {
+        console.error('Erreur lors du chargement des données', error);
         this.error = error.message;
-      }
-    );
+      },
+    });
   }
 
   buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
@@ -78,7 +79,7 @@ export class HomeComponent implements OnInit {
               e.native,
               'point',
               { intersect: true },
-              true
+              true,
             );
             if (points.length) {
               const firstPoint = points[0];
