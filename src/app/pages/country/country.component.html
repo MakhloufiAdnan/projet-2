@@ -18,12 +18,15 @@
       </div>
     </div>
   </div>
+
   <div class="chart-container wrapper-container">
     <div class="container">
-      <canvas id="countryChart">{{ lineChart }}</canvas>
+      <app-country-medals-line-chart [years]="years" [medals]="medals">
+      </app-country-medals-line-chart>
       <h2>Date</h2>
     </div>
   </div>
+
   <div class="center">
     <a routerLink="">Go back</a>
   </div>

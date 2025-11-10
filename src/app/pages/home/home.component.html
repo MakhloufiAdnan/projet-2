@@ -16,5 +16,7 @@
       </div>
     </div>
   </div>
-  <canvas id="DashboardPieChart">{{ pieChart }}</canvas>
+
+  <app-medals-pie-chart [countries]="countries" [medals]="sumOfAllMedalsYears">
+  </app-medals-pie-chart>
 </div>
