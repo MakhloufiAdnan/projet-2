@@ -84,7 +84,7 @@ src/
 
       models/                                     // Les objets typés en any (pays, participations, médailles) 
                                                   //seront décrits par des interfaces (Country, Participation) et utilisés dans les services et composants.
-        country.model.ts
+        Olympic.model.ts
         participation.model.ts
 
       services/                                   // La logique actuellement dans HomeComponent et CountryComponent 
