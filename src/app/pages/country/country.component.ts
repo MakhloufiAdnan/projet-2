@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, ParamMap, Router} from '@angular/router';
@@ -6,6 +7,8 @@ import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-country',
+  standalone : true,
+  imports : [CommonModule],
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss']
 })

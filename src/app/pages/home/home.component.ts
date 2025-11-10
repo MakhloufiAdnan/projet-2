@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
@@ -5,6 +6,8 @@ import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-home',
+  standalone : true,
+  imports : [CommonModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
