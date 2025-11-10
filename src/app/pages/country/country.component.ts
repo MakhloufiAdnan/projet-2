@@ -4,14 +4,20 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { Olympic } from '../../models/olympic.model';
 import { Participation } from '../../models/participation.model';
-import { OlympicService } from 'src/app/services/olympic.service';
+import { DataService } from 'src/app/services/data.service';
 import { StatisticsService } from 'src/app/services/statistics.service';
 import { CountryMedalsLineChartComponent } from 'src/app/components/country-medals-line-chart/country-medals-line-chart.component';
+import { StatCardComponent } from 'src/app/components/stat-card/stat-card.component';
 
 @Component({
   selector: 'app-country',
   standalone: true,
-  imports: [CommonModule, CountryMedalsLineChartComponent, RouterLink],
+  imports: [
+    CommonModule,
+    CountryMedalsLineChartComponent,
+    RouterLink,
+    StatCardComponent,
+  ],
   templateUrl: './country.component.html',
   styleUrls: ['./country.component.scss'],
 })
@@ -26,7 +32,7 @@ export class CountryComponent implements OnInit {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly olympicService: OlympicService,
+    private readonly dataService: DataService,
     private readonly statisticsService: StatisticsService,
   ) {}
 
@@ -37,7 +43,7 @@ export class CountryComponent implements OnInit {
       countryName = param.get('countryName');
     });
 
-    this.olympicService.getOlympics().subscribe({
+    this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
         if (!countryName) {
           this.error = 'No country provided';

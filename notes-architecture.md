@@ -80,7 +80,7 @@ src/
     app.component.ts                              // composant racine standalone
     app.component.html
     app.component.scss
-    app-routing.module.ts
+    app.routes.ts                                  // Je supprime l'allusion à ngModule dans le nom du fichier
 
       models/                                     // Les objets typés en any (pays, participations, médailles) 
                                                   //seront décrits par des interfaces (Country, Participation) et utilisés dans les services et composants.
@@ -89,7 +89,7 @@ src/
 
       services/                                   // La logique actuellement dans HomeComponent et CountryComponent 
                                                   // (appel à HttpClient, filtrage des pays, calculs de stats) sera déplacée dans ces services.
-        olympic.service.ts                        // Contiendra tout l’accès aux données des JO (lecture du JSON mock aujourd’hui, API REST demain).
+        data.service.ts                           // Contiendra tout l’accès aux données des JO (lecture du JSON mock aujourd’hui, API REST demain).
         statistics.service.ts                     // Contiendra les calculs métiers (totaux de médailles, nombre de JO, nombre d’athlètes, etc.).
 
       pages/

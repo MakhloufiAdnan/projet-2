@@ -5,7 +5,7 @@ import { enableProdMode } from '@angular/core';
 
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import { routes } from './app/app-routing.module';
+import { routes } from './app/app.routes';
 
 if (environment.production) {
   enableProdMode();

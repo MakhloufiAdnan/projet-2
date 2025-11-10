@@ -1,10 +1,14 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-stat-card',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './stat-card.component.html',
-  styleUrl: './stat-card.component.scss',
+  styleUrls: ['./stat-card.component.scss'],
 })
-export class StatCardComponent {}
+export class StatCardComponent {
+  @Input() label = '';
+  @Input() value: number | string | null = null;
+}

@@ -6,7 +6,7 @@ import { Olympic } from '../models/olympic.model';
 @Injectable({
   providedIn: 'root',
 })
-export class OlympicService {
+export class DataService {
   private readonly olympicUrl = './assets/mock/olympic.json';
 
   constructor(private readonly http: HttpClient) {}
