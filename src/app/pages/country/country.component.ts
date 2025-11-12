@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Olympic } from '../../models/olympic.model';
 import { Participation } from '../../models/participation.model';
 import { DataService } from 'src/app/services/data.service';
@@ -21,7 +22,7 @@ import { StatCardComponent } from 'src/app/components/stat-card/stat-card.compon
   templateUrl: './country.component.html',
   styleUrl: './country.component.scss',
 })
-export class CountryComponent implements OnInit {
+export class CountryComponent implements OnInit, OnDestroy {
   public titlePage = '';
   public totalEntries = 0;
   public totalMedals = 0;
@@ -29,6 +30,8 @@ export class CountryComponent implements OnInit {
   public error = '';
   public years: number[] = [];
   public medals: number[] = [];
+
+  private readonly subscriptions = new Subscription();
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -39,11 +42,12 @@ export class CountryComponent implements OnInit {
   ngOnInit(): void {
     let countryName: string | null = null;
 
-    this.route.paramMap.subscribe((param: ParamMap) => {
+    const routeSub = this.route.paramMap.subscribe((param: ParamMap) => {
       countryName = param.get('id');
     });
+    this.subscriptions.add(routeSub);
 
-    this.dataService.getOlympics().subscribe({
+    const dataSub = this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
         if (!countryName) {
           this.error = 'No country provided';
@@ -75,5 +79,10 @@ export class CountryComponent implements OnInit {
         this.error = error.message;
       },
     });
+    this.subscriptions.add(dataSub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

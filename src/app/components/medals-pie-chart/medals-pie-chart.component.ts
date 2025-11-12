@@ -1,4 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 
@@ -9,7 +15,7 @@ import Chart from 'chart.js/auto';
   templateUrl: './medals-pie-chart.component.html',
   styleUrl: './medals-pie-chart.component.scss',
 })
-export class MedalsPieChartComponent implements OnChanges {
+export class MedalsPieChartComponent implements OnChanges, OnDestroy {
   @Input() countries: string[] = [];
   @Input() medals: number[] = [];
 
@@ -20,6 +26,12 @@ export class MedalsPieChartComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.countries.length && this.medals.length) {
       this.buildPieChart();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.pieChart) {
+      this.pieChart.destroy();
     }
   }
 
@@ -49,7 +61,18 @@ export class MedalsPieChartComponent implements OnChanges {
         ],
       },
       options: {
-        aspectRatio: 2.5,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'center',
+            labels: {
+              boxWidth: 12,
+              padding: 8,
+            },
+          },
+        },
         onClick: (e) => {
           if (e.native) {
             const points = pieChart.getElementsAtEventForMode(

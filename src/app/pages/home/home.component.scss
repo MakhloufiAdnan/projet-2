@@ -1,0 +1,54 @@
+.dashboard {
+  display: grid;
+  gap: 2rem;
+}
+
+/* Mobile ≤ 767px : 4 colonnes*/
+@media (max-width: 767px) {
+  .dashboard {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .dashboard__header,
+  .dashboard__chart {
+    grid-column: 1 / -1; 
+  }
+
+  .dashboard__chart {
+    display: flex;
+    justify-content: center; 
+  }
+}
+
+/* Tablette 768–1199px : 8 colonnes, graphe pleine largeur */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .dashboard {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  .dashboard__header,
+  .dashboard__chart {
+    grid-column: 1 / -1; 
+  }
+
+  .dashboard__chart {
+    display: flex;
+    justify-content: center; /* graphe centré en tablette */
+  }
+}
+
+/* Desktop ≥ 1200px : 12 colonnes, contenus côte à côte */
+@media (min-width: 1200px) {
+  .dashboard {
+    grid-template-columns: repeat(12, 1fr);
+    align-items: flex-start;
+  }
+
+  .dashboard__header {
+    grid-column: 1 / span 4; 
+  }
+
+  .dashboard__chart {
+    grid-column: 5 / span 8; 
+  }
+}

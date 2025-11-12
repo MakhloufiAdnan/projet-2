@@ -1,0 +1,16 @@
+.pie-chart {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.pie-chart__wrapper {
+  width: 100%;
+  max-width: 600px; /* limite la taille sur grand écran */
+}
+
+/* Pour le mobile : le canvas suit la taille du parent */
+.pie-chart__wrapper canvas {
+  width: 100% !important;
+  height: auto !important;
+}

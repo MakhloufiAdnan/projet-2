@@ -1,25 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Olympic } from '../../models/olympic.model';
 import { DataService } from 'src/app/services/data.service';
 import { StatisticsService } from 'src/app/services/statistics.service';
 import { MedalsPieChartComponent } from 'src/app/components/medals-pie-chart/medals-pie-chart.component';
-import { HeaderComponent, HeaderIndicator } from 'src/app/components/header/header.component';
+import {
+  HeaderComponent,
+  HeaderIndicator,
+} from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [
-    CommonModule,
-    MedalsPieChartComponent,
-    HeaderComponent,
-  ],
+  imports: [CommonModule, MedalsPieChartComponent, HeaderComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit {
-
+export class HomeComponent implements OnInit, OnDestroy {
   // Variables header
   public headerTitle = 'Medals per Country';
   public headerIndicators: HeaderIndicator[] = [];
@@ -30,20 +29,16 @@ export class HomeComponent implements OnInit {
   public totalJOs = 0;
   public error = '';
 
-  private updateHeader(): void {
-    this.headerIndicators = [
-      { label: 'Number of countries', value: this.totalCountries },
-      { label: 'Number of JOs', value: this.totalJOs },
-    ];
-  }
-  
+  // Conteneur de toutes les subscriptions du composant
+  private readonly subscriptions = new Subscription();
+
   constructor(
     private readonly dataService: DataService,
     private readonly statisticsService: StatisticsService,
   ) {}
 
   ngOnInit(): void {
-    this.dataService.getOlympics().subscribe({
+    const olympicsSub = this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
         if (!data || data.length === 0) {
           this.error = 'No data available';
@@ -63,5 +58,18 @@ export class HomeComponent implements OnInit {
         this.error = error.message;
       },
     });
+
+    this.subscriptions.add(olympicsSub);
+  }
+
+  private updateHeader(): void {
+    this.headerIndicators = [
+      { label: 'Number of countries', value: this.totalCountries },
+      { label: 'Number of JOs', value: this.totalJOs },
+    ];
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
