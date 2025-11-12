@@ -1,0 +1,25 @@
+.line-chart {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.line-chart__wrapper {
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 2 / 1;
+}
+
+/* le canvas suit la taille du parent */
+.line-chart__wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .line-chart__wrapper {
+    max-width: 100%;
+    aspect-ratio: 1.4 / 1;
+  }
+}

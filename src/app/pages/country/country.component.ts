@@ -8,7 +8,7 @@ import { Participation } from '../../models/participation.model';
 import { DataService } from 'src/app/services/data.service';
 import { StatisticsService } from 'src/app/services/statistics.service';
 import { CountryMedalsLineChartComponent } from 'src/app/components/country-medals-line-chart/country-medals-line-chart.component';
-import { StatCardComponent } from 'src/app/components/stat-card/stat-card.component';
+import { HeaderComponent, HeaderIndicator } from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-country',
@@ -17,7 +17,7 @@ import { StatCardComponent } from 'src/app/components/stat-card/stat-card.compon
     CommonModule,
     CountryMedalsLineChartComponent,
     RouterLink,
-    StatCardComponent,
+    HeaderComponent,
   ],
   templateUrl: './country.component.html',
   styleUrl: './country.component.scss',
@@ -32,7 +32,18 @@ export class CountryComponent implements OnInit, OnDestroy {
   public medals: number[] = [];
 
   private readonly subscriptions = new Subscription();
+  public headerIndicators: HeaderIndicator[] = [];
 
+  private updateHeader(
+    selectedCountry: Olympic,
+    participations: Participation[],
+  ): void {
+    this.headerIndicators = [
+      { label: 'Number of entries', value: participations.length },
+      { label: 'Total number of medals', value: this.totalMedals },
+      { label: 'Total number of athletes', value: this.totalAthletes },
+    ];
+  }
   constructor(
     private readonly route: ActivatedRoute,
     private readonly dataService: DataService,
@@ -74,6 +85,7 @@ export class CountryComponent implements OnInit, OnDestroy {
           this.statisticsService.getTotalMedals(participations);
         this.totalAthletes =
           this.statisticsService.getTotalAthletes(participations);
+        this.updateHeader(selectedCountry, participations);
       },
       error: (error: HttpErrorResponse) => {
         this.error = error.message;

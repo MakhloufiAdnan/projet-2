@@ -1,25 +1,20 @@
-<div>
-  <div>
-    <div class="center">
-      <div>{{ titlePage }}</div>
-    </div>
-    <div class="split">
-      <app-stat-card label="Number of entries" [value]="totalEntries" />
-
-      <app-stat-card label="Total Number of medals" [value]="totalMedals" />
-
-      <app-stat-card label="Total Number of athletes" [value]="totalAthletes" />
-    </div>
-  </div>
-
-  <div class="chart-container wrapper-container">
-    <div class="container">
-      <app-country-medals-line-chart [years]="years" [medals]="medals" />
-      <h2>Date</h2>
-    </div>
-  </div>
-
-  <div class="center">
-    <a routerLink="">Go back</a>
-  </div>
+<div class="country-page">
+  <section class="country-page__header">
+    <app-header
+      [title]="titlePage"
+      [indicators]="headerIndicators">
+    </app-header>
+  </section>
+  <section class="country-page__chart">
+    <app-country-medals-line-chart
+      [years]="years"
+      [medals]="medals">
+    </app-country-medals-line-chart>
+  </section>
+  <button
+    type="button"
+    class="back-button"
+    routerLink="/">
+    ← Back to dashboard
+  </button>
 </div>
