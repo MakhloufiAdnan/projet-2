@@ -1,18 +1,19 @@
-<h2>Olympic games app</h2>
-<hr />
-<div>
-  <div>
-    <div class="center">
-      <div>{{ titlePage }}</div>
-    </div>
-    <div class="split">
-      <app-stat-card label="Number of countries" [value]="totalCountries" />
-      <app-stat-card label="Number of JOs" [value]="totalJOs" />
-    </div>
-  </div>
+<h2 class="page-header__title">
+  Olympic games app
+</h2>
+<p>TéléSport a préparé une section « Jeux Olympiques » pour visualiser les performances des 
+pays.
+</p>
+<div class="dashboard">
+  <section class="dashboard__header">
+    <app-header
+      [title]="headerTitle"
+      [indicators]="headerIndicators" />
+  </section>
 
-  <app-medals-pie-chart
-    [countries]="countries"
-    [medals]="sumOfAllMedalsYears"
-  />
+  <section class="dashboard__chart">
+    <app-medals-pie-chart
+      [countries]="countries"
+      [medals]="sumOfAllMedalsYears" />
+  </section>
 </div>

@@ -19,7 +19,7 @@ import { StatCardComponent } from 'src/app/components/stat-card/stat-card.compon
     StatCardComponent,
   ],
   templateUrl: './country.component.html',
-  styleUrls: ['./country.component.scss'],
+  styleUrl: './country.component.scss',
 })
 export class CountryComponent implements OnInit {
   public titlePage = '';
@@ -40,7 +40,7 @@ export class CountryComponent implements OnInit {
     let countryName: string | null = null;
 
     this.route.paramMap.subscribe((param: ParamMap) => {
-      countryName = param.get('countryName');
+      countryName = param.get('id');
     });
 
     this.dataService.getOlympics().subscribe({

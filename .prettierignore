@@ -4,3 +4,7 @@ package-lock.json
 
 # ignorer tous les fichiers Markdown
 *.md
+
+# ignore les fichier html et scss
+*.html
+*.scss

@@ -7,7 +7,7 @@ import Chart from 'chart.js/auto';
   standalone: true,
   imports: [],
   templateUrl: './medals-pie-chart.component.html',
-  styleUrls: ['./medals-pie-chart.component.scss'],
+  styleUrl: './medals-pie-chart.component.scss',
 })
 export class MedalsPieChartComponent implements OnChanges {
   @Input() countries: string[] = [];

@@ -6,7 +6,7 @@ import Chart from 'chart.js/auto';
   standalone: true,
   imports: [],
   templateUrl: './country-medals-line-chart.component.html',
-  styleUrls: ['./country-medals-line-chart.component.scss'],
+  styleUrl: './country-medals-line-chart.component.scss',
 })
 export class CountryMedalsLineChartComponent implements OnChanges {
   @Input() years: number[] = [];
