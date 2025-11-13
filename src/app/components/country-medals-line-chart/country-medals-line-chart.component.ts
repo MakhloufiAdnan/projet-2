@@ -1,4 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import Chart from 'chart.js/auto';
 
 @Component({
@@ -6,9 +12,9 @@ import Chart from 'chart.js/auto';
   standalone: true,
   imports: [],
   templateUrl: './country-medals-line-chart.component.html',
-  styleUrls: ['./country-medals-line-chart.component.scss'],
+  styleUrl: './country-medals-line-chart.component.scss',
 })
-export class CountryMedalsLineChartComponent implements OnChanges {
+export class CountryMedalsLineChartComponent implements OnChanges, OnDestroy {
   @Input() years: number[] = [];
   @Input() medals: number[] = [];
 
@@ -17,6 +23,12 @@ export class CountryMedalsLineChartComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.years.length && this.medals.length) {
       this.buildChart();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.lineChart) {
+      this.lineChart.destroy();
     }
   }
 
@@ -31,14 +43,37 @@ export class CountryMedalsLineChartComponent implements OnChanges {
         labels: this.years,
         datasets: [
           {
-            label: 'medals',
+            label: 'Medals',
             data: this.medals,
             backgroundColor: '#0b868f',
+            borderColor: '#0b868f',
+            tension: 0,
           },
         ],
       },
       options: {
-        aspectRatio: 2.5,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Year',
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Medals',
+            },
+            beginAtZero: true,
+          },
+        },
       },
     });
 

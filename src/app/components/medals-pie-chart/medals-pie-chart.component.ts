@@ -1,4 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 
@@ -7,22 +13,33 @@ import Chart from 'chart.js/auto';
   standalone: true,
   imports: [],
   templateUrl: './medals-pie-chart.component.html',
-  styleUrls: ['./medals-pie-chart.component.scss'],
+  styleUrl: './medals-pie-chart.component.scss',
 })
-export class MedalsPieChartComponent implements OnChanges {
+export class MedalsPieChartComponent implements OnChanges, OnDestroy {
+  // Input pour les propriété countries, medals, et country IDs
   @Input() countries: string[] = [];
   @Input() medals: number[] = [];
+  @Input() countryIds: number[] = [];
 
   public pieChart!: Chart<'pie', number[], string>;
 
   constructor(private readonly router: Router) {}
 
+  // Méthode appelée à chaque changement des inputs
   ngOnChanges(changes: SimpleChanges): void {
     if (this.countries.length && this.medals.length) {
       this.buildPieChart();
     }
   }
 
+  // Méthode appelée lors de la destruction du composant
+  ngOnDestroy(): void {
+    if (this.pieChart) {
+      this.pieChart.destroy();
+    }
+  }
+
+  // Méthode pour construire le graphique
   private buildPieChart(): void {
     if (this.pieChart) {
       this.pieChart.destroy();
@@ -48,8 +65,23 @@ export class MedalsPieChartComponent implements OnChanges {
           },
         ],
       },
+
+      //  Options du graphique
       options: {
-        aspectRatio: 2.5,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'center',
+            labels: {
+              boxWidth: 12,
+              padding: 8,
+            },
+          },
+        },
+
+        // Gestion du clic sur une portion du graphique
         onClick: (e) => {
           if (e.native) {
             const points = pieChart.getElementsAtEventForMode(
@@ -60,10 +92,10 @@ export class MedalsPieChartComponent implements OnChanges {
             );
             if (points.length) {
               const firstPoint = points[0];
-              const countryName = pieChart.data.labels
-                ? pieChart.data.labels[firstPoint.index]
-                : '';
-              this.router.navigate(['country', countryName]);
+              const countryId = this.countryIds[firstPoint.index];
+              if (countryId != null) {
+                this.router.navigate(['country', countryId]);
+              }
             }
           }
         },

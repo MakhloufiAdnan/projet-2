@@ -9,11 +9,16 @@ export const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'country/:countryName',
+    path: 'country/:id',
     component: CountryComponent,
   },
+
+  // page Not Found
   {
-    path: '**',
+    path: 'not-found',
     component: NotFoundComponent,
   },
+
+  // toute URL inconnue → redirige vers /not-found (pour éviter l’écran vide)
+  { path: '**', redirectTo: 'not-found' },
 ];
