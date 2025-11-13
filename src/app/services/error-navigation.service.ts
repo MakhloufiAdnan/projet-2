@@ -1,5 +1,3 @@
-// src/app/services/error-navigation.service.ts
-
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ErrorType } from '../models/error-page.model';
