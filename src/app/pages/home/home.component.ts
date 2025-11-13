@@ -33,9 +33,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   public totalCountries = 0;
   public totalJOs = 0;
 
-  // Variable pour la gestion des erreurs
-  public error = '';
-
   // Conteneur de toutes les subscriptions du composant
   private readonly subscriptions = new Subscription();
 
@@ -50,7 +47,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     const olympicsSub = this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
         if (!data || data.length === 0) {
-          this.error = 'No data available';
           // Redirection vers la pages not-found
           this.router.navigate(['/not-found']);
           return;
@@ -71,7 +67,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       // Gestion des erreurs lors de la récupération des données
       error: (error: HttpErrorResponse) => {
-        this.error = 'Erreur lors du chargement des données';
         this.router.navigate(['/not-found']);
       },
     });

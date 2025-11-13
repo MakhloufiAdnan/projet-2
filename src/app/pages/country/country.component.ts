@@ -2,7 +2,14 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subscription, filter, map, switchMap } from 'rxjs';
+import {
+  Subscription,
+  defaultIfEmpty,
+  filter,
+  map,
+  switchMap,
+  take,
+} from 'rxjs';
 import { Participation } from '../../models/participation.model';
 import { DataService } from 'src/app/services/data.service';
 import { StatisticsService } from 'src/app/services/statistics.service';
@@ -29,7 +36,6 @@ export class CountryComponent implements OnInit, OnDestroy {
   public totalEntries = 0;
   public totalMedals = 0;
   public totalAthletes = 0;
-  public error = '';
   public years: number[] = [];
   public medals: number[] = [];
 
@@ -58,23 +64,33 @@ export class CountryComponent implements OnInit, OnDestroy {
     // Récupération de l’ID du pays depuis les paramètres de l’URL
     const sub = this.route.paramMap
       .pipe(
+        // 1er jeu de paramètres
+        take(1),
+
+        // Convertir l'id param en nombre
         map((params) => Number(params.get('id'))),
+
+        // Filtre les IDs valides (entier positif)
         filter((id) => Number.isFinite(id) && Number.isInteger(id) && id > 0),
+
+        // Si aucun id valide n'est passé au filter : defaultIfEmpty émet null
         switchMap((countryId) =>
           this.dataService
             .getOlympics()
-            .pipe(map((data) => ({ data, countryId }))),
+            .pipe(map((data) => data.find((o) => o.id === countryId) ?? null)),
         ),
+        defaultIfEmpty(null),
       )
       .subscribe({
-        next: ({ data, countryId }) => {
-          const selectedCountry = data.find((o) => o.id === countryId);
+        next: (selectedCountry) => {
+          // Cas 1 : id invalide OU pays non trouvé : selectedCountry === null
           if (selectedCountry == null) {
             // Si le pays inexistant : redirection vers la page not-found
             this.router.navigate(['/not-found']);
             return;
           }
 
+          // Cas 2 : cas valide
           const participations = selectedCountry.participations;
           this.years = participations.map((p) => p.year);
           this.medals = participations.map((p) => p.medalsCount);
