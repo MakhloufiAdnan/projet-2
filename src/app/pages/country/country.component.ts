@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   Subscription,
   defaultIfEmpty,
@@ -18,6 +18,7 @@ import {
   HeaderComponent,
   HeaderIndicator,
 } from 'src/app/components/header/header.component';
+import { ErrorNavigationService } from 'src/app/services/error-navigation.service';
 
 @Component({
   selector: 'app-country',
@@ -55,7 +56,7 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
+    private readonly errorNav: ErrorNavigationService,
     private readonly dataService: DataService,
     private readonly statisticsService: StatisticsService,
   ) {}
@@ -85,8 +86,17 @@ export class CountryComponent implements OnInit, OnDestroy {
         next: (selectedCountry) => {
           // Cas 1 : id invalide OU pays non trouvé : selectedCountry === null
           if (selectedCountry == null) {
-            // Si le pays inexistant : redirection vers la page not-found
-            this.router.navigate(['/not-found']);
+            // Relit la valeur brute de l'id depuis l'URL
+            const idParam = this.route.snapshot.paramMap.get('id');
+            const numericId = Number(idParam);
+
+            // Si ce n'est pas un nombre entier → URL mal formée → bad-url
+            if (!Number.isFinite(numericId) || !Number.isInteger(numericId)) {
+              this.errorNav.triggerError('bad-url');
+            } else {
+              // C'est un nombre entier, mais aucun pays ne correspond → invalid-id
+              this.errorNav.triggerError('invalid-id');
+            }
             return;
           }
 
@@ -104,8 +114,8 @@ export class CountryComponent implements OnInit, OnDestroy {
           this.updateHeader(participations);
         },
         error: (err: HttpErrorResponse) => {
-          // Si les données manquantes : redirection vers la page not-found
-          this.router.navigate(['/not-found']);
+          // En cas d'erreur lors de la récupération des données
+          this.errorNav.triggerError('missing-data');
         },
       });
     this.subscriptions.add(sub);

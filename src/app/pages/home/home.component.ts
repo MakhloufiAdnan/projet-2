@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Olympic } from '../../models/olympic.model';
 import { DataService } from 'src/app/services/data.service';
@@ -11,6 +10,7 @@ import {
   HeaderComponent,
   HeaderIndicator,
 } from 'src/app/components/header/header.component';
+import { ErrorNavigationService } from 'src/app/services/error-navigation.service';
 
 @Component({
   selector: 'app-home',
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private readonly dataService: DataService,
     private readonly statisticsService: StatisticsService,
-    private readonly router: Router,
+    private readonly errorNav: ErrorNavigationService,
   ) {}
 
   // Initialisation du composant
@@ -47,11 +47,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     const olympicsSub = this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
         if (!data || data.length === 0) {
-          // Redirection vers la pages not-found
-          this.router.navigate(['/not-found']);
+          // En cas de données manquantes ou vides
+          this.errorNav.triggerError('missing-data');
           return;
         }
-
         this.totalJOs = this.statisticsService.getTotalJOs(data);
         this.countries = data.map((o) => o.country);
         this.countryIds = data.map((o) => o.id);
@@ -67,7 +66,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       // Gestion des erreurs lors de la récupération des données
       error: (error: HttpErrorResponse) => {
-        this.router.navigate(['/not-found']);
+        this.errorNav.triggerError('missing-data');
       },
     });
 

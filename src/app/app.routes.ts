@@ -19,6 +19,10 @@ export const routes: Routes = [
     component: NotFoundComponent,
   },
 
-  // toute URL inconnue → redirige vers /not-found (pour éviter l’écran vide)
-  { path: '**', redirectTo: 'not-found' },
+  // toute URL inconnue → NotFound avec type d'erreur "bad-url", évite l'écran vide
+  {
+    path: '**',
+    component: NotFoundComponent,
+    data: { errorType: 'bad-url' },
+  },
 ];
