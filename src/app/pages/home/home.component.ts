@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Olympic } from '../../models/olympic.model';
 import { DataService } from 'src/app/services/data.service';
@@ -41,6 +42,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private readonly dataService: DataService,
     private readonly statisticsService: StatisticsService,
+    private readonly router: Router,
   ) {}
 
   // Initialisation du composant
@@ -49,6 +51,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       next: (data: Olympic[]) => {
         if (!data || data.length === 0) {
           this.error = 'No data available';
+          // Redirection vers la pages not-found
+          this.router.navigate(['/not-found']);
           return;
         }
 
@@ -64,9 +68,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         // Mise à jour des indicateurs du header
         this.updateHeader();
       },
+
+      // Gestion des erreurs lors de la récupération des données
       error: (error: HttpErrorResponse) => {
-        console.error('Erreur lors du chargement des données', error);
-        this.error = error.message;
+        this.error = 'Erreur lors du chargement des données';
+        this.router.navigate(['/not-found']);
       },
     });
 
@@ -81,7 +87,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     ];
   }
 
-  // Méthode appelée lors de la destruction du composant
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }

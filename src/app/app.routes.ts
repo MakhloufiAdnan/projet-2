@@ -12,8 +12,13 @@ export const routes: Routes = [
     path: 'country/:id',
     component: CountryComponent,
   },
+
+  // page Not Found
   {
-    path: '**',
+    path: 'not-found',
     component: NotFoundComponent,
   },
+
+  // toute URL inconnue → redirige vers /not-found (pour éviter l’écran vide)
+  { path: '**', redirectTo: 'not-found' },
 ];

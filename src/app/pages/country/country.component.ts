@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { Olympic } from '../../models/olympic.model';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subscription, filter, map, switchMap } from 'rxjs';
 import { Participation } from '../../models/participation.model';
 import { DataService } from 'src/app/services/data.service';
 import { StatisticsService } from 'src/app/services/statistics.service';
@@ -41,10 +40,7 @@ export class CountryComponent implements OnInit, OnDestroy {
   public headerIndicators: HeaderIndicator[] = [];
 
   // Méthode pour mettre à jour les indicateurs du header
-  private updateHeader(
-    selectedCountry: Olympic,
-    participations: Participation[],
-  ): void {
+  private updateHeader(participations: Participation[]): void {
     this.headerIndicators = [
       { label: 'Number of entries', value: participations.length },
       { label: 'Total number of medals', value: this.totalMedals },
@@ -53,53 +49,50 @@ export class CountryComponent implements OnInit, OnDestroy {
   }
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly dataService: DataService,
     private readonly statisticsService: StatisticsService,
   ) {}
 
   ngOnInit(): void {
-    let countryId: number | null = null;
+    // Récupération de l’ID du pays depuis les paramètres de l’URL
+    const sub = this.route.paramMap
+      .pipe(
+        map((params) => Number(params.get('id'))),
+        filter((id) => Number.isFinite(id) && Number.isInteger(id) && id > 0),
+        switchMap((countryId) =>
+          this.dataService
+            .getOlympics()
+            .pipe(map((data) => ({ data, countryId }))),
+        ),
+      )
+      .subscribe({
+        next: ({ data, countryId }) => {
+          const selectedCountry = data.find((o) => o.id === countryId);
+          if (selectedCountry == null) {
+            // Si le pays inexistant : redirection vers la page not-found
+            this.router.navigate(['/not-found']);
+            return;
+          }
 
-    // Récupération de l’ID du pays depuis les paramètres de la route
-    const routeSub = this.route.paramMap.subscribe((param: ParamMap) => {
-      const idParam = param.get('id');
-      countryId = idParam === null ? null : Number(idParam);
-    });
-    this.subscriptions.add(routeSub);
+          const participations = selectedCountry.participations;
+          this.years = participations.map((p) => p.year);
+          this.medals = participations.map((p) => p.medalsCount);
 
-    // Récupération des données du pays sélectionné
-    const dataSub = this.dataService.getOlympics().subscribe({
-      next: (data: Olympic[]) => {
-        if (countryId == null || Number.isNaN(countryId)) {
-          this.error = 'Invalid country id';
-          return;
-        }
-
-        const selectedCountry = data.find((o: Olympic) => o.id === countryId);
-
-        if (selectedCountry == null) {
-          this.error = 'Country not found';
-          return;
-        }
-
-        const participations = selectedCountry.participations;
-
-        this.years = participations.map((p: Participation) => p.year);
-        this.medals = participations.map((p: Participation) => p.medalsCount);
-
-        this.titlePage = selectedCountry.country;
-        this.totalEntries = participations.length;
-        this.totalMedals =
-          this.statisticsService.getTotalMedals(participations);
-        this.totalAthletes =
-          this.statisticsService.getTotalAthletes(participations);
-        this.updateHeader(selectedCountry, participations);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.error = error.message;
-      },
-    });
-    this.subscriptions.add(dataSub);
+          this.titlePage = selectedCountry.country;
+          this.totalEntries = participations.length;
+          this.totalMedals =
+            this.statisticsService.getTotalMedals(participations);
+          this.totalAthletes =
+            this.statisticsService.getTotalAthletes(participations);
+          this.updateHeader(participations);
+        },
+        error: (err: HttpErrorResponse) => {
+          // Si les données manquantes : redirection vers la page not-found
+          this.router.navigate(['/not-found']);
+        },
+      });
+    this.subscriptions.add(sub);
   }
 
   // Méthode appelée lors de la destruction du composant
