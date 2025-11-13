@@ -23,10 +23,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   public headerTitle = 'Medals per Country';
   public headerIndicators: HeaderIndicator[] = [];
 
+  // Variables pour le graphique
   public countries: string[] = [];
   public sumOfAllMedalsYears: number[] = [];
+  public countryIds: number[] = [];
+
+  // variables statistiques
   public totalCountries = 0;
   public totalJOs = 0;
+
+  // Variable pour la gestion des erreurs
   public error = '';
 
   // Conteneur de toutes les subscriptions du composant
@@ -37,6 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private readonly statisticsService: StatisticsService,
   ) {}
 
+  // Initialisation du composant
   ngOnInit(): void {
     const olympicsSub = this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
@@ -47,10 +54,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.totalJOs = this.statisticsService.getTotalJOs(data);
         this.countries = data.map((o) => o.country);
+        this.countryIds = data.map((o) => o.id);
+
         this.totalCountries = this.statisticsService.getTotalCountries(data);
         this.sumOfAllMedalsYears = data.map((o) =>
           this.statisticsService.getTotalMedals(o.participations),
         );
+
+        // Mise à jour des indicateurs du header
         this.updateHeader();
       },
       error: (error: HttpErrorResponse) => {
@@ -62,6 +73,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subscriptions.add(olympicsSub);
   }
 
+  // Méthode pour mettre à jour les indicateurs du header
   private updateHeader(): void {
     this.headerIndicators = [
       { label: 'Number of countries', value: this.totalCountries },
@@ -69,6 +81,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     ];
   }
 
+  // Méthode appelée lors de la destruction du composant
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }

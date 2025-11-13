@@ -1,9 +1,11 @@
 <h2 class="page-header__title">
   Olympic games app
 </h2>
-<p>TéléSport a préparé une section « Jeux Olympiques » pour visualiser les performances des 
-pays.
+<p>
+  TéléSport a préparé une section « Jeux Olympiques » pour visualiser les performances des 
+  pays.
 </p>
+
 <div class="dashboard">
   <section class="dashboard__header">
     <app-header
@@ -14,6 +16,7 @@ pays.
   <section class="dashboard__chart">
     <app-medals-pie-chart
       [countries]="countries"
-      [medals]="sumOfAllMedalsYears" />
+      [medals]="sumOfAllMedalsYears"
+      [countryIds]="countryIds" />
   </section>
 </div>

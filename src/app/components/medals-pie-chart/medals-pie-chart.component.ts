@@ -16,25 +16,30 @@ import Chart from 'chart.js/auto';
   styleUrl: './medals-pie-chart.component.scss',
 })
 export class MedalsPieChartComponent implements OnChanges, OnDestroy {
+  // Input pour les propriété countries, medals, et country IDs
   @Input() countries: string[] = [];
   @Input() medals: number[] = [];
+  @Input() countryIds: number[] = [];
 
   public pieChart!: Chart<'pie', number[], string>;
 
   constructor(private readonly router: Router) {}
 
+  // Méthode appelée à chaque changement des inputs
   ngOnChanges(changes: SimpleChanges): void {
     if (this.countries.length && this.medals.length) {
       this.buildPieChart();
     }
   }
 
+  // Méthode appelée lors de la destruction du composant
   ngOnDestroy(): void {
     if (this.pieChart) {
       this.pieChart.destroy();
     }
   }
 
+  // Méthode pour construire le graphique
   private buildPieChart(): void {
     if (this.pieChart) {
       this.pieChart.destroy();
@@ -60,6 +65,8 @@ export class MedalsPieChartComponent implements OnChanges, OnDestroy {
           },
         ],
       },
+
+      //  Options du graphique
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -73,6 +80,8 @@ export class MedalsPieChartComponent implements OnChanges, OnDestroy {
             },
           },
         },
+
+        // Gestion du clic sur une portion du graphique
         onClick: (e) => {
           if (e.native) {
             const points = pieChart.getElementsAtEventForMode(
@@ -83,10 +92,10 @@ export class MedalsPieChartComponent implements OnChanges, OnDestroy {
             );
             if (points.length) {
               const firstPoint = points[0];
-              const countryName = pieChart.data.labels
-                ? pieChart.data.labels[firstPoint.index]
-                : '';
-              this.router.navigate(['country', countryName]);
+              const countryId = this.countryIds[firstPoint.index];
+              if (countryId != null) {
+                this.router.navigate(['country', countryId]);
+              }
             }
           }
         },

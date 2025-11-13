@@ -8,7 +8,10 @@ import { Participation } from '../../models/participation.model';
 import { DataService } from 'src/app/services/data.service';
 import { StatisticsService } from 'src/app/services/statistics.service';
 import { CountryMedalsLineChartComponent } from 'src/app/components/country-medals-line-chart/country-medals-line-chart.component';
-import { HeaderComponent, HeaderIndicator } from 'src/app/components/header/header.component';
+import {
+  HeaderComponent,
+  HeaderIndicator,
+} from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-country',
@@ -31,9 +34,13 @@ export class CountryComponent implements OnInit, OnDestroy {
   public years: number[] = [];
   public medals: number[] = [];
 
+  // Gestion des subscriptions
   private readonly subscriptions = new Subscription();
+
+  // Indicateurs pour le header
   public headerIndicators: HeaderIndicator[] = [];
 
+  // Méthode pour mettre à jour les indicateurs du header
   private updateHeader(
     selectedCountry: Olympic,
     participations: Participation[],
@@ -51,25 +58,26 @@ export class CountryComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    let countryName: string | null = null;
+    let countryId: number | null = null;
 
+    // Récupération de l’ID du pays depuis les paramètres de la route
     const routeSub = this.route.paramMap.subscribe((param: ParamMap) => {
-      countryName = param.get('id');
+      const idParam = param.get('id');
+      countryId = idParam === null ? null : Number(idParam);
     });
     this.subscriptions.add(routeSub);
 
+    // Récupération des données du pays sélectionné
     const dataSub = this.dataService.getOlympics().subscribe({
       next: (data: Olympic[]) => {
-        if (!countryName) {
-          this.error = 'No country provided';
+        if (countryId == null || Number.isNaN(countryId)) {
+          this.error = 'Invalid country id';
           return;
         }
 
-        const selectedCountry = data.find(
-          (o: Olympic) => o.country === countryName,
-        );
+        const selectedCountry = data.find((o: Olympic) => o.id === countryId);
 
-        if (!selectedCountry) {
+        if (selectedCountry == null) {
           this.error = 'Country not found';
           return;
         }
@@ -94,6 +102,7 @@ export class CountryComponent implements OnInit, OnDestroy {
     this.subscriptions.add(dataSub);
   }
 
+  // Méthode appelée lors de la destruction du composant
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
